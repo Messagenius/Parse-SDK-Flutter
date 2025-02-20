@@ -145,7 +145,8 @@ class LiveQueryClient {
   static LiveQueryClient get instance => _getInstance();
   static LiveQueryClient? _instance;
 
-  static LiveQueryClient _getInstance({bool? debug, bool? autoSendSessionId}) {
+  static LiveQueryClient _getInstance(
+      {bool? debug, bool? autoSendSessionId, int? pingInterval}) {
     String? liveQueryURL = ParseCoreData().liveQueryURL;
     if (liveQueryURL == null) {
       assert(false,
@@ -161,6 +162,7 @@ class LiveQueryClient {
     LiveQueryClient instance = _instance ??
         LiveQueryClient._internal(liveQueryURL,
             debug: debug, autoSendSessionId: autoSendSessionId);
+    _pingInterval ??= pingInterval;
     _instance ??= instance;
     return instance;
   }
@@ -181,6 +183,8 @@ class LiveQueryClient {
   late LiveQueryReconnectingController reconnectingController;
 
   final Map<int, Subscription> _requestSubscription = <int, Subscription>{};
+
+  static int? _pingInterval;
 
   Future<void> reconnect({bool userInitialized = false}) async {
     await _connect(userInitialized: userInitialized);
@@ -273,7 +277,8 @@ class LiveQueryClient {
 
     try {
       parse_web_socket.WebSocket webSocket =
-          await parse_web_socket.WebSocket.connect(_liveQueryURL);
+          await parse_web_socket.WebSocket.connect(_liveQueryURL,
+              pingInterval: _pingInterval);
       _webSocket = webSocket;
       _connecting = false;
       if (webSocket.readyState == parse_web_socket.WebSocket.open) {
@@ -448,11 +453,14 @@ class LiveQueryClient {
 }
 
 class LiveQuery {
-  LiveQuery({bool? debug, bool? autoSendSessionId}) {
+  LiveQuery({bool? debug, bool? autoSendSessionId, int? pingInterval}) {
     _debug = isDebugEnabled(objectLevelDebug: debug);
     _sendSessionId = autoSendSessionId ?? ParseCoreData().autoSendSessionId;
     client = LiveQueryClient._getInstance(
-        debug: _debug, autoSendSessionId: _sendSessionId);
+      debug: _debug,
+      autoSendSessionId: _sendSessionId,
+      pingInterval: pingInterval,
+    );
   }
 
   bool? _debug;

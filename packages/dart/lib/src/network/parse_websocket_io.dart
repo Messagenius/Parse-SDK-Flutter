@@ -16,8 +16,13 @@ class WebSocket {
 
   final io.WebSocket _webSocket;
 
-  static Future<WebSocket> connect(String liveQueryURL) async {
-    return WebSocket._(await io.WebSocket.connect(liveQueryURL));
+  static Future<WebSocket> connect(String liveQueryURL,
+      {int? pingInterval}) async {
+    var webSocket = await io.WebSocket.connect(liveQueryURL);
+    if (pingInterval != null) {
+      webSocket.pingInterval = Duration(seconds: pingInterval);
+    }
+    return WebSocket._(webSocket);
   }
 
   int get readyState => _webSocket.readyState;
