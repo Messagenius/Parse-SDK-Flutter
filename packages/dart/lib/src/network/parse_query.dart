@@ -113,7 +113,7 @@ class QueryBuilder<T extends ParseObject> {
 
   /// Includes other ParseObjects stored as a Pointer
   void includeObject(List<String> objectTypes) {
-    limiters['include'] = concatenateArray(objectTypes);
+    // limiters['include'] = concatenateArray(objectTypes);
   }
 
   /// Add a constraint for finding objects where the String value in [column]
