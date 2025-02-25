@@ -16,7 +16,8 @@ class WebSocket {
 
   final html.WebSocket _webSocket;
 
-  static Future<WebSocket> connect(String liveQueryURL) async {
+  static Future<WebSocket> connect(String liveQueryURL,
+      {int? pingInterval}) async {
     final html.WebSocket webSocket = html.WebSocket(liveQueryURL);
     await webSocket.onOpen.first;
     return WebSocket._(webSocket);
