@@ -30,7 +30,9 @@ class UserProviderApi implements UserProviderContract {
 
   @override
   Future<ApiResponse> login(User user) async {
-    return getApiResponse<User>(await user.login());
+    var installation = await ParseInstallation.currentInstallation();
+    return getApiResponse<User>(
+        await user.login(installationId: installation.installationId));
   }
 
   @override
@@ -45,7 +47,9 @@ class UserProviderApi implements UserProviderContract {
 
   @override
   Future<ApiResponse> signUp(User user) async {
-    return getApiResponse<User>(await user.signUp());
+    var installation = await ParseInstallation.currentInstallation();
+    return getApiResponse<User>(
+        await user.signUp(installationId: installation.installationId));
   }
 
   @override

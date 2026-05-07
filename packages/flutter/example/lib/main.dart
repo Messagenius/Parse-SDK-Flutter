@@ -121,12 +121,16 @@ class _MyAppState extends State<MyApp> {
 
   Future<void> test() async {
     User user = User('test_user', 'test_password', 'test@gmail.com');
-    final ParseResponse signUpResponse = await user.signUp();
+    var installation = await ParseInstallation.currentInstallation();
+    final ParseResponse signUpResponse =
+        await user.signUp(installationId: installation.installationId);
 
     if (signUpResponse.success) {
       user = signUpResponse.result;
     } else {
-      final ParseResponse loginResponse = await user.login();
+      var installation = await ParseInstallation.currentInstallation();
+      final ParseResponse loginResponse =
+          await user.login(installationId: installation.installationId);
 
       if (loginResponse.success) {
         user = loginResponse.result;
@@ -233,7 +237,9 @@ class _MyAppState extends State<MyApp> {
     user1.authData;
 
     /// Login
-    ParseResponse? response = await user.login();
+    var installation = await ParseInstallation.currentInstallation();
+    ParseResponse? response =
+        await user.login(installationId: installation.installationId);
     if (response.success) {
       user = response.result;
     }
@@ -270,7 +276,7 @@ class _MyAppState extends State<MyApp> {
 
     user =
         ParseUser('TestFlutter', 'TestPassword123', 'phill.wiggins@gmail.com');
-    response = await user.login();
+    response = await user.login(installationId: installation.installationId);
     if (response.success) {
       user = response.result;
     }
