@@ -164,8 +164,7 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// Set [doNotSendInstallationID] to 'true' in order to prevent the SDK from sending the installationID to the Server.
   /// This option is especially useful if you are running you application on web and you don't have permission to add 'X-Parse-Installation-Id' as an allowed header on your parse-server.
   Future<ParseResponse> signUp(
-      {bool allowWithoutEmail = false,
-      bool doNotSendInstallationID = false}) async {
+      {bool allowWithoutEmail = false, required String? installationId}) async {
     forgetLocalSession();
 
     try {
@@ -189,12 +188,10 @@ class ParseUser extends ParseObject implements ParseCloneable {
       final Uri url = getSanitisedUri(_client, path);
       final String body = json.encode(toJson(forApiRQ: true));
       _saveChanges();
-      final String? installationId = await _getInstallationId();
       final ParseNetworkResponse response = await _client.post(url.toString(),
           options: ParseNetworkOptions(headers: <String, String>{
             keyHeaderRevocableSession: '1',
-            if (installationId != null && !doNotSendInstallationID)
-              keyHeaderInstallationId: installationId,
+            if (installationId != null) keyHeaderInstallationId: installationId,
           }),
           data: body);
 
@@ -211,7 +208,7 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// provided, call this method to login.
   /// Set [doNotSendInstallationID] to 'true' in order to prevent the SDK from sending the installationID to the Server.
   /// This option is especially useful if you are running you application on web and you don't have permission to set 'X-Parse-Installation-Id' as an allowed header on your parse-server.
-  Future<ParseResponse> login({bool doNotSendInstallationID = false}) async {
+  Future<ParseResponse> login({required String? installationId}) async {
     forgetLocalSession();
 
     try {
@@ -219,7 +216,6 @@ class ParseUser extends ParseObject implements ParseCloneable {
         keyVarUsername: username!,
         keyVarPassword: password!
       };
-      final String? installationId = await _getInstallationId();
       final Uri url = getSanitisedUri(_client, keyEndPointLogin);
       _saveChanges();
       final ParseNetworkResponse response = await _client.post(
@@ -227,8 +223,7 @@ class ParseUser extends ParseObject implements ParseCloneable {
         data: jsonEncode(queryParams),
         options: ParseNetworkOptions(headers: <String, String>{
           keyHeaderRevocableSession: '1',
-          if (installationId != null && !doNotSendInstallationID)
-            keyHeaderInstallationId: installationId,
+          if (installationId != null) keyHeaderInstallationId: installationId,
         }),
       );
 
@@ -243,19 +238,17 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// Set [doNotSendInstallationID] to 'true' in order to prevent the SDK from sending the installationID to the Server.
   /// This option is especially useful if you are running you application on web and you don't have permission to add 'X-Parse-Installation-Id' as an allowed header on your parse-server.
   Future<ParseResponse> loginAnonymous(
-      {bool doNotSendInstallationID = false}) async {
+      {required String? installationId}) async {
     forgetLocalSession();
     try {
       final Uri url = getSanitisedUri(_client, keyEndPointUsers);
       const Uuid uuid = Uuid();
-      final String? installationId = await _getInstallationId();
 
       final ParseNetworkResponse response = await _client.post(
         url.toString(),
         options: ParseNetworkOptions(headers: <String, String>{
           keyHeaderRevocableSession: '1',
-          if (installationId != null && !doNotSendInstallationID)
-            keyHeaderInstallationId: installationId,
+          if (installationId != null) keyHeaderInstallationId: installationId,
         }),
         data: jsonEncode(<String, dynamic>{
           'authData': <String, dynamic>{
@@ -276,31 +269,29 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// Set [doNotSendInstallationID] to 'true' in order to prevent the SDK from sending the installationID to the Server.
   /// This option is especially useful if you are running you application on web and you don't have permission to add 'X-Parse-Installation-Id' as an allowed header on your parse-server.
   static Future<ParseResponse> loginWith(String provider, Object authData,
-      {bool doNotSendInstallationID = false,
+      {required String? installationId,
       String? username,
       String? password,
       String? email}) async {
     final ParseUser user = ParseUser.createUser(username, password, email);
     final ParseResponse response = await user._loginWith(provider, authData,
-        doNotSendInstallationID: doNotSendInstallationID);
+        installationId: installationId);
     return response;
   }
 
   /// Set [doNotSendInstallationID] to 'true' in order to prevent the SDK from sending the installationID to the Server.
   /// This option is especially useful if you are running you application on web and you don't have permission to add 'X-Parse-Installation-Id' as an allowed header on your parse-server.
   Future<ParseResponse> _loginWith(String provider, Object authData,
-      {bool doNotSendInstallationID = false}) async {
+      {required String? installationId}) async {
     try {
       final Uri url = getSanitisedUri(_client, keyEndPointUsers);
-      final String? installationId = await _getInstallationId();
       final Map<String, dynamic> body = toJson(forApiRQ: true);
       body['authData'] = <String, dynamic>{provider: authData};
       final ParseNetworkResponse response = await _client.post(
         url.toString(),
         options: ParseNetworkOptions(headers: <String, String>{
           keyHeaderRevocableSession: '1',
-          if (installationId != null && !doNotSendInstallationID)
-            keyHeaderInstallationId: installationId,
+          if (installationId != null) keyHeaderInstallationId: installationId,
         }),
         data: jsonEncode(body),
       );
@@ -393,9 +384,9 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// If changes are made to the current user, call save to sync them with
   /// Parse Server
   @override
-  Future<ParseResponse> save({dynamic context}) async {
+  Future<ParseResponse> save({dynamic context, String? installationId}) async {
     if (objectId == null) {
-      return await signUp();
+      return await signUp(installationId: installationId);
     } else {
       final ParseResponse response = await super.save();
       if (response.success) {
@@ -406,9 +397,10 @@ class ParseUser extends ParseObject implements ParseCloneable {
   }
 
   @override
-  Future<ParseResponse> update({dynamic context}) async {
+  Future<ParseResponse> update(
+      {dynamic context, String? installationId}) async {
     if (objectId == null) {
-      return await signUp();
+      return await signUp(installationId: installationId);
     } else {
       final ParseResponse response = await super.update();
       if (response.success) {
@@ -513,10 +505,4 @@ class ParseUser extends ParseObject implements ParseCloneable {
 
   static ParseUser _getEmptyUser() =>
       ParseCoreData.instance.createParseUser(null, null, null);
-
-  static Future<String?> _getInstallationId() async {
-    final ParseInstallation parseInstallation =
-        await ParseInstallation.currentInstallation();
-    return parseInstallation.installationId;
-  }
 }

@@ -159,10 +159,11 @@ class LiveQueryClient {
         liveQueryURL = liveQueryURL.replaceAll('http', 'ws');
       }
     }
+    _pingInterval ??= pingInterval;
+
     LiveQueryClient instance = _instance ??
         LiveQueryClient._internal(liveQueryURL,
             debug: debug, autoSendSessionId: autoSendSessionId);
-    _pingInterval ??= pingInterval;
     _instance ??= instance;
     return instance;
   }
@@ -231,6 +232,7 @@ class LiveQueryClient {
       QueryBuilder<T> query,
       {T? copyObject}) async {
     if (_webSocket == null) {
+      reconnect();
       await _clientEventStream.any((LiveQueryClientEvent event) =>
           event == LiveQueryClientEvent.connected);
     }
@@ -269,7 +271,6 @@ class LiveQueryClient {
 
   Future<dynamic> _connect({bool userInitialized = false}) async {
     if (_connecting) {
-      print('already connecting');
       return Future<void>.value(null);
     }
     await disconnect(userInitialized: userInitialized);

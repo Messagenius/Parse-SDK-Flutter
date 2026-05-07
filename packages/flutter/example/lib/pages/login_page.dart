@@ -43,11 +43,14 @@ class _LoginPageState extends State<LoginPage> {
 
       ParseResponse response;
       try {
+        var installation = await ParseInstallation.currentInstallation();
         if (_formMode == FormMode.login) {
-          response = await user.login();
+          response =
+              await user.login(installationId: installation.installationId);
           print('Signed in');
         } else {
-          response = await user.signUp();
+          response =
+              await user.signUp(installationId: installation.installationId);
           print('Signed up user:');
         }
         setState(() {
