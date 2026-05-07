@@ -62,14 +62,8 @@ void testUnmergeableOperationShouldThrow({
   String testingOnKey = 'key';
 
   final Map<Function, List> operationsFuncRefWithArgs = {
-    parseObject.setAdd: [
-      testingOnKey,
-      1,
-    ],
-    parseObject.setAddUnique: [
-      testingOnKey,
-      1,
-    ],
+    parseObject.setAdd: [testingOnKey, 1],
+    parseObject.setAddUnique: [testingOnKey, 1],
     parseObject.setAddAll: [
       testingOnKey,
       [1, 2],
@@ -78,29 +72,20 @@ void testUnmergeableOperationShouldThrow({
       testingOnKey,
       [1, 2],
     ],
-    parseObject.setRemove: [
-      testingOnKey,
-      1,
-    ],
+    parseObject.setRemove: [testingOnKey, 1],
     parseObject.setRemoveAll: [
       testingOnKey,
-      [1, 2]
+      [1, 2],
     ],
-    parseObject.setIncrement: [
-      testingOnKey,
-      1,
-    ],
-    parseObject.setDecrement: [
-      testingOnKey,
-      1,
-    ],
+    parseObject.setIncrement: [testingOnKey, 1],
+    parseObject.setDecrement: [testingOnKey, 1],
     parseObject.addRelation: [
       testingOnKey,
-      [ParseObject('class')]
+      [ParseObject('class')],
     ],
     parseObject.removeRelation: [
       testingOnKey,
-      [ParseObject('class')]
+      [ParseObject('class')],
     ],
   };
 

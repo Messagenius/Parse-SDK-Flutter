@@ -1,7 +1,10 @@
 part of '../../parse_server_sdk.dart';
 
 void logAPIResponse(
-    String className, String type, ParseResponse parseResponse) {
+  String className,
+  String type,
+  ParseResponse parseResponse,
+) {
   const String spacer = ' \n';
   String responseString = '';
 
@@ -32,7 +35,12 @@ void logAPIResponse(
 }
 
 void logRequest(
-    String? appName, String className, String type, String uri, String body) {
+  String? appName,
+  String className,
+  String type,
+  String uri,
+  String body,
+) {
   String requestString = ' \n';
   final String name = appName != null ? '$appName ' : '';
   requestString += '----\n${name}API Request ($className : $type) :';

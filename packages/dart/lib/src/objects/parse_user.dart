@@ -55,8 +55,10 @@ class ParseUser extends ParseObject implements ParseCloneable {
     }
   }
 
-  Map<String, dynamic> get acl => super
-      .get<Map<String, dynamic>>(keyVarAcl, defaultValue: <String, dynamic>{})!;
+  Map<String, dynamic> get acl => super.get<Map<String, dynamic>>(
+        keyVarAcl,
+        defaultValue: <String, dynamic>{},
+      )!;
 
   set acl(Map<String, dynamic> acl) =>
       set<Map<String, dynamic>>(keyVarAcl, acl);
@@ -86,10 +88,16 @@ class ParseUser extends ParseObject implements ParseCloneable {
   set authData(Map<String, dynamic>? authData) =>
       set<Map<String, dynamic>?>(keyVarAuthData, authData);
 
-  static ParseUser createUser(
-      [String? username, String? password, String? emailAddress]) {
-    return ParseCoreData.instance
-        .createParseUser(username, password, emailAddress);
+  static ParseUser createUser([
+    String? username,
+    String? password,
+    String? emailAddress,
+  ]) {
+    return ParseCoreData.instance.createParseUser(
+      username,
+      password,
+      emailAddress,
+    );
   }
 
   /// Gets the current user from the server
@@ -99,8 +107,11 @@ class ParseUser extends ParseObject implements ParseCloneable {
   /// returned.
   ///
   /// NOTE: If using custom ParseUserObject create instance and user [getUpdatedUser]
-  static Future<ParseResponse?> getCurrentUserFromServer(String token,
-      {bool? debug, ParseClient? client}) async {
+  static Future<ParseResponse?> getCurrentUserFromServer(
+    String token, {
+    bool? debug,
+    ParseClient? client,
+  }) async {
     final ParseUser user = _getEmptyUser();
     user.sessionToken = token;
     return user.getUpdatedUser(debug: debug, client: client);
@@ -110,13 +121,16 @@ class ParseUser extends ParseObject implements ParseCloneable {
   ///
   /// Uses token to get the latest version of the user. Prefer this to [getCurrentUserFromServer]
   /// if using custom ParseUser object
-  Future<ParseResponse> getUpdatedUser(
-      {bool? debug, ParseClient? client}) async {
+  Future<ParseResponse> getUpdatedUser({
+    bool? debug,
+    ParseClient? client,
+  }) async {
     final bool debugLocal = isDebugEnabled(objectLevelDebug: debug);
     final ParseClient clientLocal = client ??
         ParseCoreData().clientCreator(
-            sendSessionId: true,
-            securityContext: ParseCoreData().securityContext);
+          sendSessionId: true,
+          securityContext: ParseCoreData().securityContext,
+        );
 
     // We can't get the current user and session without a sessionId
     if ((ParseCoreData().sessionId == null) && (sessionToken == null)) {
@@ -136,10 +150,19 @@ class ParseUser extends ParseObject implements ParseCloneable {
         options: ParseNetworkOptions(headers: headers),
       );
       return await _handleResponse(
-          this, response, ParseApiRQ.currentUser, debugLocal, parseClassName);
+        this,
+        response,
+        ParseApiRQ.currentUser,
+        debugLocal,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(
-          e, ParseApiRQ.currentUser, debugLocal, parseClassName);
+        e,
+        ParseApiRQ.currentUser,
+        debugLocal,
+        parseClassName,
+      );
     }
   }
 
@@ -172,14 +195,16 @@ class ParseUser extends ParseObject implements ParseCloneable {
         if (!allowWithoutEmail) {
           assert(() {
             print(
-                '`ParseUser().signUp()` failed, because the email is not set. If you want to allow signUp without a set email, you should run `ParseUser().signUp(allowWithoutEmail = true)`');
+              '`ParseUser().signUp()` failed, because the email is not set. If you want to allow signUp without a set email, you should run `ParseUser().signUp(allowWithoutEmail = true)`',
+            );
             return true;
           }());
           throw '`signUp` failed, because `emailAddress` of ParseUser was not provided and `allowWithoutEmail` was `false`';
         } else {
           assert(() {
             print(
-                'It is recommended to only allow user signUp with an email set.');
+              'It is recommended to only allow user signUp with an email set.',
+            );
             return true;
           }());
         }
@@ -196,7 +221,12 @@ class ParseUser extends ParseObject implements ParseCloneable {
           data: body);
 
       return await _handleResponse(
-          this, response, ParseApiRQ.signUp, _debug, parseClassName);
+        this,
+        response,
+        ParseApiRQ.signUp,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.signUp, _debug, parseClassName);
     }
@@ -214,7 +244,7 @@ class ParseUser extends ParseObject implements ParseCloneable {
     try {
       final Map<String, dynamic> queryParams = <String, String>{
         keyVarUsername: username!,
-        keyVarPassword: password!
+        keyVarPassword: password!,
       };
       final Uri url = getSanitisedUri(_client, keyEndPointLogin);
       _saveChanges();
@@ -228,7 +258,12 @@ class ParseUser extends ParseObject implements ParseCloneable {
       );
 
       return await _handleResponse(
-          this, response, ParseApiRQ.login, _debug, parseClassName);
+        this,
+        response,
+        ParseApiRQ.login,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.login, _debug, parseClassName);
     }
@@ -252,16 +287,25 @@ class ParseUser extends ParseObject implements ParseCloneable {
         }),
         data: jsonEncode(<String, dynamic>{
           'authData': <String, dynamic>{
-            'anonymous': <String, dynamic>{'id': uuid.v4()}
-          }
+            'anonymous': <String, dynamic>{'id': uuid.v4()},
+          },
         }),
       );
 
       return await _handleResponse(
-          this, response, ParseApiRQ.loginAnonymous, _debug, parseClassName);
+        this,
+        response,
+        ParseApiRQ.loginAnonymous,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(
-          e, ParseApiRQ.loginAnonymous, _debug, parseClassName);
+        e,
+        ParseApiRQ.loginAnonymous,
+        _debug,
+        parseClassName,
+      );
     }
   }
 
@@ -297,7 +341,12 @@ class ParseUser extends ParseObject implements ParseCloneable {
       );
 
       return await _handleResponse(
-          this, response, ParseApiRQ.loginWith, _debug, parseClassName);
+        this,
+        response,
+        ParseApiRQ.loginWith,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.loginWith, _debug, parseClassName);
     }
@@ -311,11 +360,12 @@ class ParseUser extends ParseObject implements ParseCloneable {
 
     if (sessionId == null) {
       return await _handleResponse(
-          this,
-          ParseNetworkResponse(data: "{}", statusCode: 200),
-          ParseApiRQ.logout,
-          _debug,
-          parseClassName);
+        this,
+        ParseNetworkResponse(data: "{}", statusCode: 200),
+        ParseApiRQ.logout,
+        _debug,
+        parseClassName,
+      );
     }
 
     forgetLocalSession();
@@ -329,11 +379,17 @@ class ParseUser extends ParseObject implements ParseCloneable {
       final ParseNetworkResponse response = await _client.post(
         url.toString(),
         options: ParseNetworkOptions(
-            headers: <String, String>{keyHeaderSessionToken: sessionId}),
+          headers: <String, String>{keyHeaderSessionToken: sessionId},
+        ),
       );
 
       return await _handleResponse(
-          this, response, ParseApiRQ.logout, _debug, parseClassName);
+        this,
+        response,
+        ParseApiRQ.logout,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.logout, _debug, parseClassName);
     }
@@ -356,11 +412,20 @@ class ParseUser extends ParseObject implements ParseCloneable {
         '${ParseCoreData().serverUrl}$keyEndPointVerificationEmail',
         data: json.encode(<String, dynamic>{keyVarEmail: emailAddress}),
       );
-      return await _handleResponse(this, response,
-          ParseApiRQ.verificationEmailRequest, _debug, parseClassName);
+      return await _handleResponse(
+        this,
+        response,
+        ParseApiRQ.verificationEmailRequest,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(
-          e, ParseApiRQ.verificationEmailRequest, _debug, parseClassName);
+        e,
+        ParseApiRQ.verificationEmailRequest,
+        _debug,
+        parseClassName,
+      );
     }
   }
 
@@ -371,11 +436,20 @@ class ParseUser extends ParseObject implements ParseCloneable {
         '${ParseCoreData().serverUrl}$keyEndPointRequestPasswordReset',
         data: json.encode(<String, dynamic>{keyVarEmail: emailAddress}),
       );
-      return await _handleResponse(this, response,
-          ParseApiRQ.requestPasswordReset, _debug, parseClassName);
+      return await _handleResponse(
+        this,
+        response,
+        ParseApiRQ.requestPasswordReset,
+        _debug,
+        parseClassName,
+      );
     } on Exception catch (e) {
       return handleException(
-          e, ParseApiRQ.requestPasswordReset, _debug, parseClassName);
+        e,
+        ParseApiRQ.requestPasswordReset,
+        _debug,
+        parseClassName,
+      );
     }
   }
 
@@ -419,10 +493,16 @@ class ParseUser extends ParseObject implements ParseCloneable {
     if (objectId != null) {
       try {
         final Uri url = getSanitisedUri(_client, '$_path/$objectId');
-        final ParseNetworkResponse response =
-            await _client.delete(url.toString());
+        final ParseNetworkResponse response = await _client.delete(
+          url.toString(),
+        );
         return await _handleResponse(
-            this, response, ParseApiRQ.destroy, _debug, parseClassName);
+          this,
+          response,
+          ParseApiRQ.destroy,
+          _debug,
+          parseClassName,
+        );
       } on Exception catch (e) {
         return handleException(e, ParseApiRQ.destroy, _debug, parseClassName);
       }
@@ -438,23 +518,31 @@ class ParseUser extends ParseObject implements ParseCloneable {
     final bool debugLocal = isDebugEnabled(objectLevelDebug: debug);
     final ParseClient clientLocal = client ??
         ParseCoreData().clientCreator(
-            sendSessionId: true,
-            securityContext: ParseCoreData().securityContext);
+          sendSessionId: true,
+          securityContext: ParseCoreData().securityContext,
+        );
 
     try {
       final Uri url = getSanitisedUri(clientLocal, path);
-      final ParseNetworkResponse response =
-          await clientLocal.get(url.toString());
+      final ParseNetworkResponse response = await clientLocal.get(
+        url.toString(),
+      );
       final ParseResponse parseResponse = handleResponse<ParseUser>(
-          emptyUser, response, ParseApiRQ.getAll, debugLocal, keyClassUser);
+        emptyUser,
+        response,
+        ParseApiRQ.getAll,
+        debugLocal,
+        keyClassUser,
+      );
       return parseResponse;
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.getAll, debugLocal, keyClassUser);
     }
   }
 
-  static Future<dynamic> _getUserFromLocalStore(
-      {ParseCloneable? cloneable}) async {
+  static Future<dynamic> _getUserFromLocalStore({
+    ParseCloneable? cloneable,
+  }) async {
     final CoreStore coreStore = ParseCoreData().getStore();
     final String? userJson = await coreStore.getString(keyParseStoreUser);
 
@@ -475,13 +563,19 @@ class ParseUser extends ParseObject implements ParseCloneable {
 
   /// Handles all the response data for this class
   static Future<ParseResponse> _handleResponse(
-      ParseUser user,
-      ParseNetworkResponse response,
-      ParseApiRQ type,
-      bool debug,
-      String className) async {
-    final ParseResponse parseResponse =
-        handleResponse<ParseUser>(user, response, type, debug, className);
+    ParseUser user,
+    ParseNetworkResponse response,
+    ParseApiRQ type,
+    bool debug,
+    String className,
+  ) async {
+    final ParseResponse parseResponse = handleResponse<ParseUser>(
+      user,
+      response,
+      type,
+      debug,
+      className,
+    );
 
     final Map<String, dynamic> responseData = jsonDecode(response.data);
     if (responseData.containsKey(keyParamSessionToken)) {

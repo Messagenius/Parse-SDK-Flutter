@@ -41,20 +41,13 @@ void main() {
           "__op": "AddRelation",
           "objects": [
             {"__type": "Pointer", "className": "_User", "objectId": "user1"},
-            {
-              "__type": "Pointer",
-              "className": "_User",
-              "objectId": "user2",
-            }
-          ]
-        }
+            {"__type": "Pointer", "className": "_User", "objectId": "user2"},
+          ],
+        },
       };
 
       expect(
-        DeepCollectionEquality().equals(
-          expectedToJson,
-          toJsonAfterAddRelation,
-        ),
+        DeepCollectionEquality().equals(expectedToJson, toJsonAfterAddRelation),
         isTrue,
       );
     });
@@ -94,13 +87,15 @@ void main() {
       );
     });
 
-    test('removeRelation() operation should not be mergeable with any other',
-        () {
-      testUnmergeableOperationShouldThrow(
-        parseObject: dietPlansObject,
-        testingOn: dietPlansObject.removeRelation,
-      );
-    });
+    test(
+      'removeRelation() operation should not be mergeable with any other',
+      () {
+        testUnmergeableOperationShouldThrow(
+          parseObject: dietPlansObject,
+          testingOn: dietPlansObject.removeRelation,
+        );
+      },
+    );
 
     test('getParent() should rerun the parent of the relation', () {
       // arrange
@@ -125,17 +120,18 @@ void main() {
     });
 
     test(
-        'getTargetClass() should rerun null if the relation target class not known yet',
-        () {
-      // arrange
-      final relation = dietPlansObject.getRelation('someRelationKey');
+      'getTargetClass() should rerun null if the relation target class not known yet',
+      () {
+        // arrange
+        final relation = dietPlansObject.getRelation('someRelationKey');
 
-      // act
-      final targetClass = relation.targetClass;
+        // act
+        final targetClass = relation.targetClass;
 
-      // assert
-      expect(targetClass, isNull);
-    });
+        // assert
+        expect(targetClass, isNull);
+      },
+    );
 
     test(
         'getTargetClass() should rerun the target class for the relation if '
@@ -172,8 +168,8 @@ void main() {
       dietPlansObject.fromJson({
         "someRelationKey": {
           "__type": "Relation",
-          "className": "someClassNameAsTargetClass"
-        }
+          "className": "someClassNameAsTargetClass",
+        },
       }); // assume this from the server
 
       final relation = dietPlansObject.getRelation('someRelationKey');
@@ -185,14 +181,19 @@ void main() {
       expect(targetClass, equals('someClassNameAsTargetClass'));
     });
 
-    test('getQuery() should throw exception if the parent objectId is null ',
-        () {
-      // arrange
-      final relation = dietPlansObject.getRelation('someRelationKey');
+    test(
+      'getQuery() should throw exception if the parent objectId is null ',
+      () {
+        // arrange
+        final relation = dietPlansObject.getRelation('someRelationKey');
 
-      // assert
-      expect(() => relation.getQuery(), throwsA(isA<ParseRelationException>()));
-    });
+        // assert
+        expect(
+          () => relation.getQuery(),
+          throwsA(isA<ParseRelationException>()),
+        );
+      },
+    );
 
     test(
         'getQuery() should return QueryBuilder utilizing the '
@@ -231,54 +232,57 @@ void main() {
     });
 
     test(
-        'should throw an exception when trying to modify the target class if it is not null',
-        () {
-      // arrange
-      final relation = dietPlansObject.getRelation('someRelationKey');
-      relation.add(ParseObject('someClassNameAsTargetClass'));
+      'should throw an exception when trying to modify the target class if it is not null',
+      () {
+        // arrange
+        final relation = dietPlansObject.getRelation('someRelationKey');
+        relation.add(ParseObject('someClassNameAsTargetClass'));
 
-      // assert
-      expect(
-        () => relation.setTargetClass = "someOtherTargetClass",
-        throwsA(isA<ParseRelationException>()),
-      );
-    });
+        // assert
+        expect(
+          () => relation.setTargetClass = "someOtherTargetClass",
+          throwsA(isA<ParseRelationException>()),
+        );
+      },
+    );
 
     test(
-        'When calling clearUnsavedChanges() the Relation should be reverted back'
-        ' to its original state before any modifications were made', () {
-      // arrange
+      'When calling clearUnsavedChanges() the Relation should be reverted back'
+      ' to its original state before any modifications were made',
+      () {
+        // arrange
 
-      dietPlansObject.addRelation('someRelationKey', [user1, user1]);
+        dietPlansObject.addRelation('someRelationKey', [user1, user1]);
 
-      // act
-      dietPlansObject.clearUnsavedChanges();
+        // act
+        dietPlansObject.clearUnsavedChanges();
 
-      // assert
-      final valueForApiReqAfterClearUnSaved =
-          dietPlansObject.toJson(forApiRQ: true);
+        // assert
+        final valueForApiReqAfterClearUnSaved = dietPlansObject.toJson(
+          forApiRQ: true,
+        );
 
-      expect(valueForApiReqAfterClearUnSaved.isEmpty, isTrue);
+        expect(valueForApiReqAfterClearUnSaved.isEmpty, isTrue);
 
-      final relationValueForApiReq =
-          dietPlansObject.getRelation('someRelationKey').toJson();
-      expect(relationValueForApiReq.isEmpty, isTrue);
-    });
+        final relationValueForApiReq =
+            dietPlansObject.getRelation('someRelationKey').toJson();
+        expect(relationValueForApiReq.isEmpty, isTrue);
+      },
+    );
 
     test(
         'The Relation value and the value for api request should be identical '
         'before and after the save() failed to save the object', () async {
       // arrange
-      when(client.post(
-        any,
-        options: anyNamed("options"),
-        data: anyNamed("data"),
-      )).thenThrow(Exception('error'));
+      when(
+        client.post(any, options: anyNamed("options"), data: anyNamed("data")),
+      ).thenThrow(Exception('error'));
 
       dietPlansObject.addRelation('someRelationKey', [user1, user1]);
 
-      final valueForApiReqBeforeErrorSave =
-          dietPlansObject.toJson(forApiRQ: true);
+      final valueForApiReqBeforeErrorSave = dietPlansObject.toJson(
+        forApiRQ: true,
+      );
 
       final relationInternalStateBeforeErrorSave =
           dietPlansObject.getRelation('someRelationKey').toJson(full: true);
@@ -287,8 +291,9 @@ void main() {
       await dietPlansObject.save();
 
       // assert
-      final valueForApiReqAfterErrorSave =
-          dietPlansObject.toJson(forApiRQ: true);
+      final valueForApiReqAfterErrorSave = dietPlansObject.toJson(
+        forApiRQ: true,
+      );
       expect(
         DeepCollectionEquality().equals(
           valueForApiReqAfterErrorSave,
@@ -310,180 +315,171 @@ void main() {
     });
 
     test(
-        'After the save() function runs successfully for an API request, '
-        'the ParseRelation internal value for API request should be empty',
-        () async {
-      // arrange
+      'After the save() function runs successfully for an API request, '
+      'the ParseRelation internal value for API request should be empty',
+      () async {
+        // arrange
 
-      // batch arrange
-      const resultFromServerForBatch = [
-        {
-          "success": {
-            keyVarObjectId: 'YAfSAWwXbL',
-            keyVarCreatedAt: "2023-03-10T12:23:45.678Z",
-          }
-        }
-      ];
+        // batch arrange
+        const resultFromServerForBatch = [
+          {
+            "success": {
+              keyVarObjectId: 'YAfSAWwXbL',
+              keyVarCreatedAt: "2023-03-10T12:23:45.678Z",
+            },
+          },
+        ];
 
-      final batchData = jsonEncode(
-        {
+        final batchData = jsonEncode({
           "requests": [
             {
               'method': 'PUT',
               'path':
                   '$keyEndPointClasses${user1.parseClassName}/${user1.objectId}',
               'body': user1.toJson(forApiRQ: true),
-            }
-          ]
-        },
-      );
+            },
+          ],
+        });
 
-      final batchPath = Uri.parse('$serverUrl/batch').toString();
+        final batchPath = Uri.parse('$serverUrl/batch').toString();
 
-      when(client.post(
-        batchPath,
-        options: anyNamed("options"),
-        data: batchData,
-      )).thenAnswer(
-        (_) async {
+        when(
+          client.post(batchPath, options: anyNamed("options"), data: batchData),
+        ).thenAnswer((_) async {
           return ParseNetworkResponse(
             statusCode: 200,
             data: jsonEncode(resultFromServerForBatch),
           );
-        },
-      );
+        });
 
-      // post arrange
-      const resultFromServer = {
-        keyVarObjectId: "DLde4rYA8C",
-        keyVarCreatedAt: "2023-02-26T00:20:37.187Z"
-      };
+        // post arrange
+        const resultFromServer = {
+          keyVarObjectId: "DLde4rYA8C",
+          keyVarCreatedAt: "2023-02-26T00:20:37.187Z",
+        };
 
-      final postPath = Uri.parse(
-        '$serverUrl$keyEndPointClasses${dietPlansObject.parseClassName}',
-      ).toString();
+        final postPath = Uri.parse(
+          '$serverUrl$keyEndPointClasses${dietPlansObject.parseClassName}',
+        ).toString();
 
-      when(client.post(
-        postPath,
-        options: anyNamed("options"),
-        data: anyNamed("data"),
-      )).thenAnswer(
-        (_) async => ParseNetworkResponse(
-          statusCode: 200,
-          data: jsonEncode(resultFromServer),
-        ),
-      );
+        when(
+          client.post(
+            postPath,
+            options: anyNamed("options"),
+            data: anyNamed("data"),
+          ),
+        ).thenAnswer(
+          (_) async => ParseNetworkResponse(
+            statusCode: 200,
+            data: jsonEncode(resultFromServer),
+          ),
+        );
 
-      dietPlansObject.addRelation('someRelationKey', [user1]);
+        dietPlansObject.addRelation('someRelationKey', [user1]);
 
-      // act
-      await dietPlansObject.save();
+        // act
+        await dietPlansObject.save();
 
-      // assert
-      final relationValueForApiReq =
-          dietPlansObject.getRelation('someRelationKey').toJson();
-      expect(relationValueForApiReq.isEmpty, isTrue);
-    });
+        // assert
+        final relationValueForApiReq =
+            dietPlansObject.getRelation('someRelationKey').toJson();
+        expect(relationValueForApiReq.isEmpty, isTrue);
+      },
+    );
 
     test(
-        'If a Relation operation is performed during the save() function, the result'
-        ' of the operation should be present in the internal state of the '
-        'ParseRelation as a value that has not been saved. The data that has '
-        'been saved should not be in value for API request', () async {
-      // arrange
+      'If a Relation operation is performed during the save() function, the result'
+      ' of the operation should be present in the internal state of the '
+      'ParseRelation as a value that has not been saved. The data that has '
+      'been saved should not be in value for API request',
+      () async {
+        // arrange
 
-      // batch arrange
-      const resultFromServerForBatch = [
-        {
-          "success": {
-            keyVarUpdatedAt: "2023-03-10T12:23:45.678Z",
-          }
-        }
-      ];
+        // batch arrange
+        const resultFromServerForBatch = [
+          {
+            "success": {keyVarUpdatedAt: "2023-03-10T12:23:45.678Z"},
+          },
+        ];
 
-      final batchData = jsonEncode(
-        {
+        final batchData = jsonEncode({
           "requests": [
             {
               'method': 'PUT',
               'path':
                   '$keyEndPointClasses${user1.parseClassName}/${user1.objectId}',
               'body': user1.toJson(forApiRQ: true),
-            }
-          ]
-        },
-      );
+            },
+          ],
+        });
 
-      final batchPath = Uri.parse('$serverUrl/batch').toString();
+        final batchPath = Uri.parse('$serverUrl/batch').toString();
 
-      when(client.post(
-        batchPath,
-        options: anyNamed("options"),
-        data: batchData,
-      )).thenAnswer(
-        (_) async {
+        when(
+          client.post(batchPath, options: anyNamed("options"), data: batchData),
+        ).thenAnswer((_) async {
           return ParseNetworkResponse(
             statusCode: 200,
             data: jsonEncode(resultFromServerForBatch),
           );
-        },
-      );
+        });
 
-      // post arrange
-      const resultFromServer = {
-        keyVarObjectId: "DLde4rYA8C",
-        keyVarCreatedAt: "2023-02-26T00:20:37.187Z"
-      };
+        // post arrange
+        const resultFromServer = {
+          keyVarObjectId: "DLde4rYA8C",
+          keyVarCreatedAt: "2023-02-26T00:20:37.187Z",
+        };
 
-      final postPath = Uri.parse(
-        '$serverUrl$keyEndPointClasses${dietPlansObject.parseClassName}',
-      ).toString();
+        final postPath = Uri.parse(
+          '$serverUrl$keyEndPointClasses${dietPlansObject.parseClassName}',
+        ).toString();
 
-      when(client.post(
-        postPath,
-        options: anyNamed("options"),
-        data: anyNamed("data"),
-      )).thenAnswer(
-        (_) async {
+        when(
+          client.post(
+            postPath,
+            options: anyNamed("options"),
+            data: anyNamed("data"),
+          ),
+        ).thenAnswer((_) async {
           await Future.delayed(Duration(milliseconds: 100));
           return ParseNetworkResponse(
             statusCode: 200,
             data: jsonEncode(resultFromServer),
           );
-        },
-      );
+        });
 
-      dietPlansObject.addRelation('someRelationKey', [user1]);
+        dietPlansObject.addRelation('someRelationKey', [user1]);
 
-      // act
-      dietPlansObject.save();
+        // act
+        dietPlansObject.save();
 
-      // async gap, this could be anything in the app like a click of a button
-      await Future.delayed(Duration.zero);
+        // async gap, this could be anything in the app like a click of a button
+        await Future.delayed(Duration.zero);
 
-      // Then suddenly the user adds a object to the relation
-      dietPlansObject.addRelation('someRelationKey', [user2]);
+        // Then suddenly the user adds a object to the relation
+        dietPlansObject.addRelation('someRelationKey', [user2]);
 
-      // Await the save function to be done
-      await Future.delayed(Duration(milliseconds: 150));
+        // Await the save function to be done
+        await Future.delayed(Duration(milliseconds: 150));
 
-      // assert
-      final relationValueForApiReq =
-          dietPlansObject.getRelation('someRelationKey').toJson();
+        // assert
+        final relationValueForApiReq =
+            dietPlansObject.getRelation('someRelationKey').toJson();
 
-      final expectedValueAfterSave = {
-        '__op': 'AddRelation',
-        'objects': parseEncode([user2])
-      };
+        final expectedValueAfterSave = {
+          '__op': 'AddRelation',
+          'objects': parseEncode([user2]),
+        };
 
-      expect(
-        DeepCollectionEquality().equals(
-          relationValueForApiReq,
-          expectedValueAfterSave,
-        ),
-        isTrue,
-      );
-    });
+        expect(
+          DeepCollectionEquality().equals(
+            relationValueForApiReq,
+            expectedValueAfterSave,
+          ),
+          isTrue,
+        );
+      },
+    );
 
     test(
         'ParseRelation value for api request should be identical '
@@ -493,50 +489,44 @@ void main() {
       // batch arrange
       const resultFromServerForBatch = [
         {
-          "success": {
-            keyVarUpdatedAt: "2023-03-10T12:23:45.678Z",
-          }
-        }
+          "success": {keyVarUpdatedAt: "2023-03-10T12:23:45.678Z"},
+        },
       ];
 
-      final batchData = jsonEncode(
-        {
-          "requests": [
-            {
-              'method': 'PUT',
-              'path':
-                  '$keyEndPointClasses${user1.parseClassName}/${user1.objectId}',
-              'body': user1.toJson(forApiRQ: true),
-            }
-          ]
-        },
-      );
+      final batchData = jsonEncode({
+        "requests": [
+          {
+            'method': 'PUT',
+            'path':
+                '$keyEndPointClasses${user1.parseClassName}/${user1.objectId}',
+            'body': user1.toJson(forApiRQ: true),
+          },
+        ],
+      });
 
       final batchPath = Uri.parse('$serverUrl/batch').toString();
 
-      when(client.post(
-        batchPath,
-        options: anyNamed("options"),
-        data: batchData,
-      )).thenAnswer(
-        (_) async {
-          return ParseNetworkResponse(
-            statusCode: 200,
-            data: jsonEncode(resultFromServerForBatch),
-          );
-        },
-      );
+      when(
+        client.post(batchPath, options: anyNamed("options"), data: batchData),
+      ).thenAnswer((_) async {
+        return ParseNetworkResponse(
+          statusCode: 200,
+          data: jsonEncode(resultFromServerForBatch),
+        );
+      });
 
       // post arrange
       final postPath = Uri.parse(
         '$serverUrl$keyEndPointClasses${dietPlansObject.parseClassName}',
       ).toString();
 
-      when(client.post(
-        postPath,
-        options: anyNamed("options"),
-        data: anyNamed("data"),
-      )).thenThrow(Exception('error'));
+      when(
+        client.post(
+          postPath,
+          options: anyNamed("options"),
+          data: anyNamed("data"),
+        ),
+      ).thenThrow(Exception('error'));
 
       dietPlansObject.addRelation('someRelationKey', [user1]);
 
@@ -551,11 +541,12 @@ void main() {
           dietPlansObject.getRelation('someRelationKey').toJson();
 
       expect(
-          DeepCollectionEquality().equals(
-            relationValueForApiReqBeforeErrorSave,
-            relationValueForApiReqAfterErrorSave,
-          ),
-          isTrue);
+        DeepCollectionEquality().equals(
+          relationValueForApiReqBeforeErrorSave,
+          relationValueForApiReqAfterErrorSave,
+        ),
+        isTrue,
+      );
     });
 
     test(
@@ -564,8 +555,9 @@ void main() {
       // arrange
       dietPlansObject.objectId = "someId";
 
-      final ParseRelation relation =
-          dietPlansObject.getRelation('someRelationKey');
+      final ParseRelation relation = dietPlansObject.getRelation(
+        'someRelationKey',
+      );
       relation.remove(ParseObject('someClassName'));
 
       final toJsonBeforePin = relation.toJson(full: true);
@@ -589,8 +581,9 @@ void main() {
         'should throw an exception if the user adds/removes a parse object'
         ' with different target class', () {
       // arrange
-      final ParseRelation relation =
-          dietPlansObject.getRelation('someRelationKey');
+      final ParseRelation relation = dietPlansObject.getRelation(
+        'someRelationKey',
+      );
 
       relation.remove(ParseObject('someClassName')..objectId = "123");
       relation.remove(ParseObject('someClassName')..objectId = '456');
@@ -633,5 +626,137 @@ void main() {
       // assert
       expect(() => getRelation(), throwsA(isA<ParseRelationException>()));
     });
+
+    test('addRelation() should work with custom ParseObject subclasses', () {
+      // arrange
+      // Create custom ParseObject subclasses similar to the issue report
+      final contact1 = Contact()..objectId = 'contact1';
+      final contact2 = Contact()..objectId = 'contact2';
+
+      final order = Order();
+
+      // act & assert
+      // This should not throw a TypeError
+      expect(
+        () => order.addRelation('receivers', [contact1, contact2]),
+        returnsNormally,
+      );
+
+      final toJsonAfterAddRelation = order.toJson(forApiRQ: true);
+
+      const expectedToJson = {
+        "receivers": {
+          "__op": "AddRelation",
+          "objects": [
+            {
+              "__type": "Pointer",
+              "className": "Contact",
+              "objectId": "contact1",
+            },
+            {
+              "__type": "Pointer",
+              "className": "Contact",
+              "objectId": "contact2",
+            },
+          ],
+        },
+      };
+
+      expect(
+        DeepCollectionEquality().equals(expectedToJson, toJsonAfterAddRelation),
+        isTrue,
+      );
+    });
+
+    test(
+      'addRelation() should work when getRelation<T>() was called first with typed generic',
+      () {
+        // This test reproduces issue #999
+        // The issue occurs when:
+        // 1. getRelation<Contact>() is called first (creating _ParseRelation<Contact>)
+        // 2. Then addRelation() is called with Contact objects
+        // 3. The merge operation creates a Set<ParseObject>
+        // 4. Trying to cast Set<ParseObject> to Set<Contact> throws TypeError
+
+        // arrange
+        final contact1 = Contact()..objectId = 'contact1';
+        final contact2 = Contact()..objectId = 'contact2';
+
+        final order = Order();
+
+        // First, get the relation with typed generic (this creates _ParseRelation<Contact>)
+        order.getRelation<Contact>('receivers');
+
+        // act & assert
+        // This should NOT throw: _TypeError (type '_Set<ParseObject>' is not a subtype of type 'Set<Contact>' in type cast)
+        expect(
+          () => order.addRelation('receivers', [contact1, contact2]),
+          returnsNormally,
+        );
+      },
+    );
+
+    test(
+      'calling addRelation() multiple times with custom subclasses should work',
+      () {
+        // arrange
+        final contact1 = Contact()..objectId = 'contact1';
+        final contact2 = Contact()..objectId = 'contact2';
+        final contact3 = Contact()..objectId = 'contact3';
+
+        final order = Order();
+
+        // act & assert
+        // First addRelation call
+        expect(
+          () => order.addRelation('receivers', [contact1]),
+          returnsNormally,
+        );
+
+        // Second addRelation call - this should also not throw
+        expect(
+          () => order.addRelation('receivers', [contact2, contact3]),
+          returnsNormally,
+        );
+      },
+    );
+
+    test('removeRelation() should work with custom ParseObject subclasses', () {
+      // arrange
+      final contact1 = Contact()..objectId = 'contact1';
+      final contact2 = Contact()..objectId = 'contact2';
+
+      final order = Order();
+
+      // act & assert
+      expect(
+        () => order.removeRelation('receivers', [contact1, contact2]),
+        returnsNormally,
+      );
+    });
   });
+}
+
+/// Custom ParseObject subclass for testing (similar to the issue report)
+class Contact extends ParseObject implements ParseCloneable {
+  Contact() : super(_keyTableName);
+  Contact.clone() : this();
+
+  @override
+  clone(Map<String, dynamic> map) =>
+      Contact.clone()..fromJson(Map<String, dynamic>.from(map));
+
+  static const String _keyTableName = 'Contact';
+}
+
+/// Custom ParseObject subclass for testing (similar to the issue report)
+class Order extends ParseObject implements ParseCloneable {
+  Order() : super(_keyTableName);
+  Order.clone() : this();
+
+  @override
+  clone(Map<String, dynamic> map) =>
+      Order.clone()..fromJson(Map<String, dynamic>.from(map));
+
+  static const String _keyTableName = 'Order';
 }

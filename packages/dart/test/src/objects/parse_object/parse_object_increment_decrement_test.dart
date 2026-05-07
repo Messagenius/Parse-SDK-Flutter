@@ -61,33 +61,17 @@ void main() {
     });
 
     test(
-        'Incrementing should work with already present values decoded from API',
-        () {
-      // arrange
-      const resultFromServer = {
-        "objectId": "O6BHlwV48Z",
-        "createdAt": "2023-02-26T13:23:03.073Z",
-        "updatedAt": "2023-03-01T03:38:16.390Z",
-        keyFat: 2.5,
-      };
-
-      dietPlansObject = ParseObject('Diet_Plans')..fromJson(resultFromServer);
-
-      // act
-      dietPlansObject.setIncrement(keyFat, 2.5);
-
-      // assert
-      final fatValue = dietPlansObject.get(keyFat);
-
-      expect(fatValue, isA<num>());
-
-      expect(fatValue, equals(5));
-    });
-    test(
-      'setIncrement() should account for pervasively set value',
+      'Incrementing should work with already present values decoded from API',
       () {
         // arrange
-        dietPlansObject.set(keyFat, 5);
+        const resultFromServer = {
+          "objectId": "O6BHlwV48Z",
+          "createdAt": "2023-02-26T13:23:03.073Z",
+          "updatedAt": "2023-03-01T03:38:16.390Z",
+          keyFat: 2.5,
+        };
+
+        dietPlansObject = ParseObject('Diet_Plans')..fromJson(resultFromServer);
 
         // act
         dietPlansObject.setIncrement(keyFat, 2.5);
@@ -97,9 +81,23 @@ void main() {
 
         expect(fatValue, isA<num>());
 
-        expect(fatValue, equals(7.5));
+        expect(fatValue, equals(5));
       },
     );
+    test('setIncrement() should account for pervasively set value', () {
+      // arrange
+      dietPlansObject.set(keyFat, 5);
+
+      // act
+      dietPlansObject.setIncrement(keyFat, 2.5);
+
+      // assert
+      final fatValue = dietPlansObject.get(keyFat);
+
+      expect(fatValue, isA<num>());
+
+      expect(fatValue, equals(7.5));
+    });
 
     test(
         'setIncrement() operation should not be mergeable with any other'
@@ -128,10 +126,7 @@ void main() {
           equals(5.0),
         );
 
-        expect(
-          dietPlansObject.get(keyFat),
-          equals(15.0),
-        );
+        expect(dietPlansObject.get(keyFat), equals(15.0));
       },
     );
 
@@ -170,46 +165,44 @@ void main() {
     });
 
     test(
-        'Decrementing should work with already present values decoded from API',
-        () {
-      // arrange
-      const resultFromServer = {
-        "objectId": "O6BHlwV48Z",
-        "createdAt": "2023-02-26T13:23:03.073Z",
-        "updatedAt": "2023-03-01T03:38:16.390Z",
-        keyFat: 3.5,
-      };
-
-      dietPlansObject = ParseObject('Diet_Plans')..fromJson(resultFromServer);
-
-      // act
-      dietPlansObject.setDecrement(keyFat, 2.5);
-
-      // assert
-      final fatValue = dietPlansObject.get(keyFat);
-
-      expect(fatValue, isA<num>());
-
-      expect(fatValue, equals(1));
-    });
-
-    test(
-      'setDecrement() should account for pervasively set value',
+      'Decrementing should work with already present values decoded from API',
       () {
         // arrange
-        dietPlansObject.set(keyFat, 5);
+        const resultFromServer = {
+          "objectId": "O6BHlwV48Z",
+          "createdAt": "2023-02-26T13:23:03.073Z",
+          "updatedAt": "2023-03-01T03:38:16.390Z",
+          keyFat: 3.5,
+        };
+
+        dietPlansObject = ParseObject('Diet_Plans')..fromJson(resultFromServer);
 
         // act
-        dietPlansObject.setDecrement(keyFat, 3);
+        dietPlansObject.setDecrement(keyFat, 2.5);
 
         // assert
         final fatValue = dietPlansObject.get(keyFat);
 
         expect(fatValue, isA<num>());
 
-        expect(fatValue, equals(2));
+        expect(fatValue, equals(1));
       },
     );
+
+    test('setDecrement() should account for pervasively set value', () {
+      // arrange
+      dietPlansObject.set(keyFat, 5);
+
+      // act
+      dietPlansObject.setDecrement(keyFat, 3);
+
+      // assert
+      final fatValue = dietPlansObject.get(keyFat);
+
+      expect(fatValue, isA<num>());
+
+      expect(fatValue, equals(2));
+    });
 
     test(
       'the amount that should be subtracted from a value for the API should be incremental'
@@ -228,10 +221,7 @@ void main() {
           equals(-5.0),
         );
 
-        expect(
-          dietPlansObject.get(keyFat),
-          equals(5.0),
-        );
+        expect(dietPlansObject.get(keyFat), equals(5.0));
       },
     );
 
@@ -271,7 +261,7 @@ void main() {
       // arrange
       dietPlansObject.fromJson({
         'myNumber': 5,
-        "objectId": "someId"
+        "objectId": "someId",
       }); // assume this coming from the server
 
       dietPlansObject.setIncrement('myNumber', 5);
@@ -291,7 +281,7 @@ void main() {
       // arrange
       dietPlansObject.fromJson({
         'myNumber': 5,
-        "objectId": "someId"
+        "objectId": "someId",
       }); // assume this coming from the server
 
       dietPlansObject.setIncrement('myNumber', 5);
@@ -317,112 +307,112 @@ void main() {
     });
 
     test(
-      'If an Increment/Decrement operation is performed during the save() '
-      'function, the result of the operation should be present in the internal '
-      'state of the ParseNumber as a value that has not been saved. The data '
-      'that has been saved should be moved to the saved state',
-      () async {
-        // arrange
-        const resultFromServer = {
-          keyVarObjectId: "DLde4rYA8C",
-          keyVarCreatedAt: "2023-02-26T00:20:37.187Z"
-        };
+        'If an Increment/Decrement operation is performed during the save() '
+        'function, the result of the operation should be present in the internal '
+        'state of the ParseNumber as a value that has not been saved. The data '
+        'that has been saved should be moved to the saved state', () async {
+      // arrange
+      const resultFromServer = {
+        keyVarObjectId: "DLde4rYA8C",
+        keyVarCreatedAt: "2023-02-26T00:20:37.187Z",
+      };
 
-        when(client.post(
-          any,
-          options: anyNamed("options"),
-          data: anyNamed('data'),
-        )).thenAnswer(
-          (_) async {
-            await Future.delayed(Duration(milliseconds: 100));
-            return ParseNetworkResponse(
-              statusCode: 200,
-              data: jsonEncode(resultFromServer),
-            );
-          },
+      when(
+        client.post(any, options: anyNamed("options"), data: anyNamed('data')),
+      ).thenAnswer((_) async {
+        await Future.delayed(Duration(milliseconds: 100));
+        return ParseNetworkResponse(
+          statusCode: 200,
+          data: jsonEncode(resultFromServer),
         );
+      });
+
+      dietPlansObject.setIncrement('myNumber', 1);
+
+      final numberBeforeSave = dietPlansObject.get<num>('myNumber');
+      final valueForApiReqBeforeSave = dietPlansObject.toJson(forApiRQ: true);
+
+      // act
+      dietPlansObject.save();
+
+      // async gap, this could be anything in the app like a click of a button
+      await Future.delayed(Duration.zero);
+
+      // Then suddenly the user increment the value
+      dietPlansObject.setIncrement('myNumber', 3);
+
+      // Await the save function to be done
+      await Future.delayed(Duration(milliseconds: 150));
+
+      // assert
+      expect(numberBeforeSave, equals(1));
+
+      final numberAfterSave = dietPlansObject.get<num>('myNumber');
+      expect(numberAfterSave, equals(4));
+
+      const expectedValueForApiReqBeforeSave = {
+        "myNumber": {"__op": "Increment", "amount": 1},
+      };
+      expect(
+        DeepCollectionEquality().equals(
+          valueForApiReqBeforeSave,
+          expectedValueForApiReqBeforeSave,
+        ),
+        isTrue,
+      );
+
+      final valueForApiReqAfterSave = dietPlansObject.toJson(forApiRQ: true);
+      const expectedValueForApiReqAfterSave = {
+        "myNumber": {"__op": "Increment", "amount": 3},
+      };
+      expect(
+        DeepCollectionEquality().equals(
+          valueForApiReqAfterSave,
+          expectedValueForApiReqAfterSave,
+        ),
+        isTrue,
+      );
+    });
+
+    test(
+      'The number value and the number value for api request should be identical '
+      'before and after the save() failed to save the object',
+      () {
+        // arrange
+
+        when(
+          client.post(
+            any,
+            options: anyNamed("options"),
+            data: anyNamed("data"),
+          ),
+        ).thenThrow(Exception('error'));
 
         dietPlansObject.setIncrement('myNumber', 1);
 
-        final numberBeforeSave = dietPlansObject.get<num>('myNumber');
-        final valueForApiReqBeforeSave = dietPlansObject.toJson(forApiRQ: true);
+        final valueForApiReqBeforeErrorSave = dietPlansObject.toJson(
+          forApiRQ: true,
+        );
 
         // act
         dietPlansObject.save();
 
-        // async gap, this could be anything in the app like a click of a button
-        await Future.delayed(Duration.zero);
-
-        // Then suddenly the user increment the value
-        dietPlansObject.setIncrement('myNumber', 3);
-
-        // Await the save function to be done
-        await Future.delayed(Duration(milliseconds: 150));
-
         // assert
-        expect(numberBeforeSave, equals(1));
+        final numberValue = dietPlansObject.get<num>('myNumber');
 
-        final numberAfterSave = dietPlansObject.get<num>('myNumber');
-        expect(numberAfterSave, equals(4));
+        expect(numberValue, equals(1));
 
-        const expectedValueForApiReqBeforeSave = {
-          "myNumber": {"__op": "Increment", "amount": 1}
-        };
-        expect(
-          DeepCollectionEquality().equals(
-            valueForApiReqBeforeSave,
-            expectedValueForApiReqBeforeSave,
-          ),
-          isTrue,
+        final valueForApiReqAfterErrorSave = dietPlansObject.toJson(
+          forApiRQ: true,
         );
-
-        final valueForApiReqAfterSave = dietPlansObject.toJson(forApiRQ: true);
-        const expectedValueForApiReqAfterSave = {
-          "myNumber": {"__op": "Increment", "amount": 3}
-        };
         expect(
           DeepCollectionEquality().equals(
-            valueForApiReqAfterSave,
-            expectedValueForApiReqAfterSave,
+            valueForApiReqAfterErrorSave,
+            valueForApiReqBeforeErrorSave,
           ),
           isTrue,
         );
       },
     );
-
-    test(
-        'The number value and the number value for api request should be identical '
-        'before and after the save() failed to save the object', () {
-      // arrange
-
-      when(client.post(
-        any,
-        options: anyNamed("options"),
-        data: anyNamed("data"),
-      )).thenThrow(Exception('error'));
-
-      dietPlansObject.setIncrement('myNumber', 1);
-
-      final valueForApiReqBeforeErrorSave =
-          dietPlansObject.toJson(forApiRQ: true);
-
-      // act
-      dietPlansObject.save();
-
-      // assert
-      final numberValue = dietPlansObject.get<num>('myNumber');
-
-      expect(numberValue, equals(1));
-
-      final valueForApiReqAfterErrorSave =
-          dietPlansObject.toJson(forApiRQ: true);
-      expect(
-        DeepCollectionEquality().equals(
-          valueForApiReqAfterErrorSave,
-          valueForApiReqBeforeErrorSave,
-        ),
-        isTrue,
-      );
-    });
   });
 }

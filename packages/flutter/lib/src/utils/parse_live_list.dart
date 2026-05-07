@@ -2,7 +2,9 @@ part of 'package:parse_server_sdk_flutter/parse_server_sdk_flutter.dart';
 
 /// The type of function that builds a child widget for a ParseLiveList element.
 typedef ChildBuilder<T extends sdk.ParseObject> = Widget Function(
-    BuildContext context, sdk.ParseLiveListElementSnapshot<T> snapshot);
+  BuildContext context,
+  sdk.ParseLiveListElementSnapshot<T> snapshot,
+);
 
 /// The type of function that returns the stream to listen for updates from.
 typedef StreamGetter<T extends sdk.ParseObject> = Stream<T> Function();
@@ -67,7 +69,9 @@ class ParseLiveListWidget<T extends sdk.ParseObject> extends StatefulWidget {
 
   /// The default child builder function used to display a ParseLiveList element.
   static Widget defaultChildBuilder<T extends sdk.ParseObject>(
-      BuildContext context, sdk.ParseLiveListElementSnapshot<T> snapshot) {
+    BuildContext context,
+    sdk.ParseLiveListElementSnapshot<T> snapshot,
+  ) {
     Widget child;
     if (snapshot.failed) {
       child = const Text('something went wrong!');
@@ -79,9 +83,7 @@ class ParseLiveListWidget<T extends sdk.ParseObject> extends StatefulWidget {
         ),
       );
     } else {
-      child = const ListTile(
-        leading: CircularProgressIndicator(),
-      );
+      child = const ListTile(leading: CircularProgressIndicator());
     }
     return child;
   }
@@ -106,28 +108,32 @@ class _ParseLiveListWidgetState<T extends sdk.ParseObject>
               _animatedListKey.currentState;
           if (animatedListState != null) {
             if (event is sdk.ParseLiveListAddEvent) {
-              animatedListState.insertItem(event.index,
-                  duration: widget.duration);
+              animatedListState.insertItem(
+                event.index,
+                duration: widget.duration,
+              );
 
               setState(() {
                 _noData = liveList.size == 0;
               });
             } else if (event is sdk.ParseLiveListDeleteEvent) {
               animatedListState.removeItem(
-                  event.index,
-                  (BuildContext context, Animation<double> animation) =>
-                      ParseLiveListElementWidget<T>(
-                        key: ValueKey<String>(
-                            event.object.get<String>(sdk.keyVarObjectId) ??
-                                'removingItem'),
-                        childBuilder: widget.childBuilder ??
-                            ParseLiveListWidget.defaultChildBuilder,
-                        sizeFactor: animation,
-                        duration: widget.duration,
-                        loadedData: () => event.object as T,
-                        preLoadedData: () => event.object as T,
-                      ),
-                  duration: widget.duration);
+                event.index,
+                (BuildContext context, Animation<double> animation) =>
+                    ParseLiveListElementWidget<T>(
+                  key: ValueKey<String>(
+                    event.object.get<String>(sdk.keyVarObjectId) ??
+                        'removingItem',
+                  ),
+                  childBuilder: widget.childBuilder ??
+                      ParseLiveListWidget.defaultChildBuilder,
+                  sizeFactor: animation,
+                  duration: widget.duration,
+                  loadedData: () => event.object as T,
+                  preLoadedData: () => event.object as T,
+                ),
+                duration: widget.duration,
+              );
               setState(() {
                 _noData = liveList.size == 0;
               });
@@ -174,28 +180,29 @@ class _ParseLiveListWidgetState<T extends sdk.ParseObject>
 
   Widget buildAnimatedList(sdk.ParseLiveList<T> liveList) {
     return AnimatedList(
-        key: _animatedListKey,
-        physics: widget.scrollPhysics,
-        controller: widget.scrollController,
-        scrollDirection: widget.scrollDirection,
-        padding: widget.padding,
-        primary: widget.primary,
-        reverse: widget.reverse,
-        shrinkWrap: widget.shrinkWrap,
-        initialItemCount: liveList.size,
-        itemBuilder:
-            (BuildContext context, int index, Animation<double> animation) {
-          return ParseLiveListElementWidget<T>(
-            key: ValueKey<String>(liveList.getIdentifier(index)),
-            stream: () => liveList.getAt(index),
-            loadedData: () => liveList.getLoadedAt(index),
-            preLoadedData: () => liveList.getPreLoadedAt(index),
-            sizeFactor: animation,
-            duration: widget.duration,
-            childBuilder:
-                widget.childBuilder ?? ParseLiveListWidget.defaultChildBuilder,
-          );
-        });
+      key: _animatedListKey,
+      physics: widget.scrollPhysics,
+      controller: widget.scrollController,
+      scrollDirection: widget.scrollDirection,
+      padding: widget.padding,
+      primary: widget.primary,
+      reverse: widget.reverse,
+      shrinkWrap: widget.shrinkWrap,
+      initialItemCount: liveList.size,
+      itemBuilder:
+          (BuildContext context, int index, Animation<double> animation) {
+        return ParseLiveListElementWidget<T>(
+          key: ValueKey<String>(liveList.getIdentifier(index)),
+          stream: () => liveList.getAt(index),
+          loadedData: () => liveList.getLoadedAt(index),
+          preLoadedData: () => liveList.getPreLoadedAt(index),
+          sizeFactor: animation,
+          duration: widget.duration,
+          childBuilder:
+              widget.childBuilder ?? ParseLiveListWidget.defaultChildBuilder,
+        );
+      },
+    );
   }
 
   @override
@@ -208,14 +215,15 @@ class _ParseLiveListWidgetState<T extends sdk.ParseObject>
 
 class ParseLiveListElementWidget<T extends sdk.ParseObject>
     extends StatefulWidget {
-  const ParseLiveListElementWidget(
-      {super.key,
-      this.stream,
-      this.loadedData,
-      this.preLoadedData,
-      required this.sizeFactor,
-      required this.duration,
-      required this.childBuilder});
+  const ParseLiveListElementWidget({
+    super.key,
+    this.stream,
+    this.loadedData,
+    this.preLoadedData,
+    required this.sizeFactor,
+    required this.duration,
+    required this.childBuilder,
+  });
 
   final StreamGetter<T>? stream;
   final DataGetter<T>? loadedData;
@@ -238,15 +246,18 @@ class _ParseLiveListElementWidgetState<T extends sdk.ParseObject>
   @override
   void initState() {
     _snapshot = sdk.ParseLiveListElementSnapshot<T>(
-        loadedData: widget.loadedData != null ? widget.loadedData!() : null,
-        preLoadedData:
-            widget.preLoadedData != null ? widget.preLoadedData!() : null);
+      loadedData: widget.loadedData != null ? widget.loadedData!() : null,
+      preLoadedData:
+          widget.preLoadedData != null ? widget.preLoadedData!() : null,
+    );
     if (widget.stream != null) {
       _streamSubscription = widget.stream!().listen(
         (T data) {
           setState(() {
             _snapshot = sdk.ParseLiveListElementSnapshot<T>(
-                loadedData: data, preLoadedData: data);
+              loadedData: data,
+              preLoadedData: data,
+            );
           });
         },
         onError: (Object error) {
