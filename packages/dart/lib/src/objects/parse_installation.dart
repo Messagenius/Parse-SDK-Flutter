@@ -16,8 +16,6 @@ class ParseInstallation extends ParseObject {
     keyDeviceToken,
     keyDeviceType,
     keyInstallationId,
-    keyAppName,
-    keyAppVersion,
     keyAppIdentifier,
     keyParseVersion,
   ];
@@ -87,8 +85,6 @@ class ParseInstallation extends ParseObject {
     set<String>(keyTimeZone, _getNameLocalTimeZone());
 
     //App info
-    set<String?>(keyAppName, ParseCoreData().appName);
-    set<String?>(keyAppVersion, ParseCoreData().appVersion);
     set<String?>(keyAppIdentifier, ParseCoreData().appPackageName);
     set<String>(keyParseVersion, keySdkVersion);
   }
