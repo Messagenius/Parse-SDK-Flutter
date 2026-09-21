@@ -196,8 +196,6 @@ class QueryBuilder<T extends ParseObject> {
       value = _encodeStringValue(value);
     }
 
-    print('value: $value');
-
     queries.add(
       _buildQueryWithColumnValueAndOperator(
         MapEntry<String, dynamic>(column, value),
