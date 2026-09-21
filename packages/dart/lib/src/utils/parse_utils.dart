@@ -8,6 +8,28 @@ bool isDebugEnabled({bool? objectLevelDebug}) {
   return objectLevelDebug ?? ParseCoreData().debug;
 }
 
+/// Converts a query string into the JSON body of a `POST` query with
+/// `_method: "GET"`, reproducing what Parse Server does with a `GET` query
+/// string: each parameter is URL-decoded once (`+` as space) and then
+/// JSON-decoded when it is valid JSON, kept as a String otherwise.
+///
+/// The server therefore receives exactly the same parameters as with the
+/// equivalent `GET` request.
+Map<String, dynamic> queryStringToPostBody(String query) {
+  final Map<String, dynamic> body = <String, dynamic>{};
+  if (query.isEmpty) {
+    return body;
+  }
+  Uri.splitQueryString(query).forEach((String key, String value) {
+    try {
+      body[key] = jsonDecode(value);
+    } on FormatException {
+      body[key] = value;
+    }
+  });
+  return body;
+}
+
 /// Convert list of strings to a string with commas
 String concatenateArray(List<String> list) {
   String output = '';

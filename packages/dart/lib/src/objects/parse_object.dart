@@ -704,16 +704,25 @@ class ParseObject extends ParseBase implements ParseCloneable {
   }
 
   /// Can be used to create custom queries
+  ///
+  /// [viaPost] overrides [ParseCoreData.queryViaPost] for this call: when
+  /// `true` the query is sent as `POST` with `_method: "GET"`.
   Future<ParseResponse> query<T extends ParseObject>(
     String query, {
     ProgressCallback? progressCallback,
+    bool? viaPost,
   }) async {
     try {
-      final Uri url = getSanitisedUri(_client, _path, query: query);
-      final ParseNetworkResponse result = await _client.get(
-        url.toString(),
-        onReceiveProgress: progressCallback,
-      );
+      final ParseNetworkResponse result;
+      if (viaPost ?? ParseCoreData().queryViaPost) {
+        result = await _postQuery(_path, query);
+      } else {
+        final Uri url = getSanitisedUri(_client, _path, query: query);
+        result = await _client.get(
+          url.toString(),
+          onReceiveProgress: progressCallback,
+        );
+      }
       return handleResponse<T>(
         this,
         result,
@@ -726,10 +735,18 @@ class ParseObject extends ParseBase implements ParseCloneable {
     }
   }
 
-  Future<ParseResponse> distinct<T extends ParseObject>(String query) async {
+  Future<ParseResponse> distinct<T extends ParseObject>(
+    String query, {
+    bool? viaPost,
+  }) async {
     try {
-      final Uri url = getSanitisedUri(_client, _aggregatepath, query: query);
-      final ParseNetworkResponse result = await _client.get(url.toString());
+      final ParseNetworkResponse result;
+      if (viaPost ?? ParseCoreData().queryViaPost) {
+        result = await _postQuery(_aggregatepath, query);
+      } else {
+        final Uri url = getSanitisedUri(_client, _aggregatepath, query: query);
+        result = await _client.get(url.toString());
+      }
       return handleResponse<T>(
         this,
         result,
@@ -740,6 +757,32 @@ class ParseObject extends ParseBase implements ParseCloneable {
     } on Exception catch (e) {
       return handleException(e, ParseApiRQ.query, _debug, parseClassName);
     }
+  }
+
+  /// Sends a read query as `POST` with `_method: "GET"`.
+  ///
+  /// The query string goes through the same [Uri] normalisation as the `GET`
+  /// path and is then converted with [queryStringToPostBody], so the server
+  /// sees the same parameters. The client treats every POST as a write (no
+  /// retries by default), so the read retry intervals are applied here: the
+  /// request is a read and therefore idempotent.
+  Future<ParseNetworkResponse> _postQuery(String path, String query) {
+    final String normalisedQuery =
+        getSanitisedUri(_client, path, query: query).query;
+    final Map<String, dynamic> body = queryStringToPostBody(normalisedQuery)
+      ..['_method'] = 'GET';
+    final String url = getSanitisedUri(_client, path).toString();
+    return executeWithRetry(
+      operation: () => _client.post(
+        url,
+        data: json.encode(body),
+        options: ParseNetworkOptions(
+          headers: <String, String>{
+            keyHeaderContentType: keyHeaderContentTypeJson,
+          },
+        ),
+      ),
+    );
   }
 
   Future<ParseResponse> deleteEventually() async {

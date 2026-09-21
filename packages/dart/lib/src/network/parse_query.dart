@@ -47,6 +47,7 @@ class QueryBuilder<T extends ParseObject> {
       (String key, dynamic value) =>
           copy.limiters.putIfAbsent(key, () => value.toString()),
     );
+    copy.queryViaPost = query.queryViaPost;
     return copy;
   }
 
@@ -57,6 +58,10 @@ class QueryBuilder<T extends ParseObject> {
   List<MapEntry<String, dynamic>> queries = <MapEntry<String, dynamic>>[];
   final Map<String, dynamic> limiters = <String, dynamic>{};
   final Map<String, dynamic> extraOptions = <String, dynamic>{};
+
+  /// Sends this query as `POST` with `_method: "GET"` (`true`) or as `GET`
+  /// (`false`). `null` follows the global [ParseCoreData.queryViaPost].
+  bool? queryViaPost;
 
   /// Used by ParseRelation getQuery()
   void setRedirectClassNameForKey(String key) {
@@ -606,19 +611,23 @@ class QueryBuilder<T extends ParseObject> {
   Future<ParseResponse> query<U extends ParseObject>({
     ProgressCallback? progressCallback,
   }) async {
-    return object.query<U>(buildQuery(), progressCallback: progressCallback);
+    return object.query<U>(
+      buildQuery(),
+      progressCallback: progressCallback,
+      viaPost: queryViaPost,
+    );
   }
 
   Future<ParseResponse> distinct<U extends ParseObject>(
     String className,
   ) async {
     final String queryString = 'distinct=$className';
-    return object.distinct<U>(queryString);
+    return object.distinct<U>(queryString, viaPost: queryViaPost);
   }
 
   ///Counts the number of objects that match this query
   Future<ParseResponse> count() async {
-    return object.query(_buildQueryCount());
+    return object.query(_buildQueryCount(), viaPost: queryViaPost);
   }
 
   /// Builds the query for Parse
