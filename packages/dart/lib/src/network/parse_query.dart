@@ -129,7 +129,7 @@ class QueryBuilder<T extends ParseObject> {
     String prefix, {
     bool caseSensitive = false,
   }) {
-    prefix = Uri.encodeComponent(prefix);
+    prefix = _encodeStringValue(prefix);
 
     if (caseSensitive) {
       queries.add(
@@ -155,7 +155,7 @@ class QueryBuilder<T extends ParseObject> {
     String prefix, {
     bool caseSensitive = false,
   }) {
-    prefix = Uri.encodeComponent(prefix);
+    prefix = _encodeStringValue(prefix);
 
     if (caseSensitive) {
       queries.add(
@@ -195,6 +195,8 @@ class QueryBuilder<T extends ParseObject> {
     if (value is String) {
       value = _encodeStringValue(value);
     }
+
+    print('value: $value');
 
     queries.add(
       _buildQueryWithColumnValueAndOperator(
@@ -351,7 +353,7 @@ class QueryBuilder<T extends ParseObject> {
     String substring, {
     bool caseSensitive = false,
   }) {
-    substring = Uri.encodeComponent(substring);
+    substring = _encodeStringValue(substring);
 
     if (caseSensitive) {
       queries.add(
@@ -380,7 +382,7 @@ class QueryBuilder<T extends ParseObject> {
     bool orderByScore = true,
     bool diacriticSensitive = false,
   }) {
-    searchTerm = Uri.encodeComponent(searchTerm);
+    searchTerm = _encodeStringValue(searchTerm);
 
     queries.add(
       MapEntry<String, dynamic>(
