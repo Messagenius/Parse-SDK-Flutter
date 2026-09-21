@@ -174,11 +174,26 @@ class QueryBuilder<T extends ParseObject> {
     }
   }
 
+  /// Percent-encodes a string value so it survives both the JSON `where` and
+  /// the single URL-decoding pass the server applies to the query string.
+  ///
+  /// The value is JSON-escaped first and then encoded: encoding the raw value
+  /// would turn `"` into `%22`, which the server decodes back into an unescaped
+  /// quote, breaking the `where` JSON (e.g. a JSON document stored as a String).
+  /// The result has only unreserved characters and `%XX` escapes, so the later
+  /// `jsonEncode` leaves it untouched.
+  String _encodeStringValue(String value) {
+    final String jsonLiteral = jsonEncode(value);
+    return Uri.encodeComponent(
+      jsonLiteral.substring(1, jsonLiteral.length - 1),
+    );
+  }
+
   /// Add a constraint to the query that requires a particular [column]'s value
   /// to be equal to the provided [value]
   void whereEqualTo(String column, dynamic value) {
     if (value is String) {
-      value = Uri.encodeComponent(value);
+      value = _encodeStringValue(value);
     }
 
     queries.add(
@@ -237,7 +252,7 @@ class QueryBuilder<T extends ParseObject> {
   /// to be not equal to the provided [value]
   void whereNotEqualTo(String column, dynamic value) {
     if (value is String) {
-      value = Uri.encodeComponent(value);
+      value = _encodeStringValue(value);
     }
 
     queries.add(

@@ -697,5 +697,26 @@ void main() {
 
       expect(queryString, equals(expectedQueryString.toString()));
     });
+
+    test('whereEqualTo/whereNotEqualTo keep the where valid JSON for values '
+        'containing quotes and backslashes', () {
+      // arrange
+      const jsonValue =
+          '{"kty":"EC","crv":"P-256","x":"RZPS-zc4_WZ","y":"67uR+dbK/y="}';
+      const backslashValue = r'C:\path "quoted" & more';
+      final queryBuilder = QueryBuilder.name('PublicKeys')
+        ..whereEqualTo('key', jsonValue)
+        ..whereNotEqualTo('other', backslashValue);
+
+      // act: decode the query string once, as the server does
+      final String where = Uri.decodeComponent(
+        queryBuilder.buildQuery().replaceFirst('where=', ''),
+      );
+      final Map<String, dynamic> decoded = jsonDecode(where);
+
+      // assert
+      expect(decoded['key'], equals(jsonValue));
+      expect(decoded['other'], equals({r'$ne': backslashValue}));
+    });
   });
 }
