@@ -35,6 +35,7 @@ class ParseCoreData {
     List<int>? restRetryIntervals,
     List<int>? restRetryIntervalsForWrites,
     List<int>? liveListRetryIntervals,
+    bool queryViaPost = false,
     ParseConnectivityProvider? connectivityProvider,
     String? fileDirectory,
     Stream<void>? appResumedStream,
@@ -62,6 +63,7 @@ class ParseCoreData {
         (parseIsWeb
             ? <int>[0, 500, 1000, 2000, 5000]
             : <int>[0, 500, 1000, 2000, 5000, 10000]);
+    _instance.queryViaPost = queryViaPost;
     _instance._subClassHandler = ParseSubClassHandler(
       registeredSubClassMap: registeredSubClassMap,
       parseUserConstructor: parseUserConstructor,
@@ -96,6 +98,11 @@ class ParseCoreData {
   late List<int> restRetryIntervals;
   late List<int> restRetryIntervalsForWrites;
   late List<int> liveListRetryIntervals;
+
+  /// Global default for sending queries as `POST` with `_method: "GET"`.
+  /// Can be changed at runtime; [QueryBuilder.queryViaPost] set on a single
+  /// query takes precedence.
+  late bool queryViaPost;
   ParseConnectivityProvider? connectivityProvider;
   String? fileDirectory;
   Stream<void>? appResumedStream;
