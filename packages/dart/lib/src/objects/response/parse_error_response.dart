@@ -9,7 +9,7 @@ ParseResponse buildErrorResponse(
     final Map<String, dynamic> responseData = json.decode(apiResponse.data);
 
     response.error = ParseError(
-      code: responseData[keyCode] ?? ParseError.otherCause,
+      code: responseData[keyCode] ?? apiResponse.statusCode,
       message: responseData[keyError].toString(),
     );
 
