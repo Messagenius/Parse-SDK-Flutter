@@ -113,6 +113,12 @@ class Parse {
   ///   Configure only if you have idempotency guarantees in place.
   /// * [liveListRetryIntervals] - Optional list of retry delay intervals for
   ///   LiveQuery operations.
+  /// * [queryViaPost] - When `true`, queries (find, count, distinct) are sent as
+  ///   `POST` with `_method: "GET"` and the query parameters in a JSON body,
+  ///   instead of a `GET` with a query string. Avoids URL length limits.
+  ///   Defaults to `false`. Can be overridden per query via
+  ///   [QueryBuilder.queryViaPost] and changed later via
+  ///   [ParseCoreData.queryViaPost].
   Future<Parse> initialize(
     String appId,
     String serverUrl, {
@@ -134,6 +140,7 @@ class Parse {
     List<int>? restRetryIntervals,
     List<int>? restRetryIntervalsForWrites,
     List<int>? liveListRetryIntervals,
+    bool queryViaPost = false,
     ParseConnectivityProvider? connectivityProvider,
     String? fileDirectory,
     Stream<void>? appResumedStream,
@@ -162,6 +169,7 @@ class Parse {
       restRetryIntervals: restRetryIntervals,
       restRetryIntervalsForWrites: restRetryIntervalsForWrites,
       liveListRetryIntervals: liveListRetryIntervals,
+      queryViaPost: queryViaPost,
       connectivityProvider: connectivityProvider,
       fileDirectory: fileDirectory,
       appResumedStream: appResumedStream,

@@ -57,6 +57,10 @@ class Parse extends sdk.Parse
   ///   Applies to: POST, PUT, and postBytes methods.
   ///   Default: [] (no retries to prevent duplicate data creation).
   ///   Configure only if you have idempotency guarantees in place.
+  ///
+  /// [queryViaPost] - Send queries (find, count, distinct) as `POST` with
+  ///   `_method: "GET"` and a JSON body instead of a `GET` query string.
+  ///   Default: false. Can be overridden per query via `QueryBuilder.queryViaPost`.
   @override
   Future<Parse> initialize(
     String appId,
@@ -79,6 +83,7 @@ class Parse extends sdk.Parse
     List<int>? restRetryIntervals,
     List<int>? restRetryIntervalsForWrites,
     List<int>? liveListRetryIntervals,
+    bool queryViaPost = false,
     sdk.ParseConnectivityProvider? connectivityProvider,
     String? fileDirectory,
     Stream<void>? appResumedStream,
@@ -115,6 +120,7 @@ class Parse extends sdk.Parse
       restRetryIntervals: restRetryIntervals,
       restRetryIntervalsForWrites: restRetryIntervalsForWrites,
       liveListRetryIntervals: liveListRetryIntervals,
+      queryViaPost: queryViaPost,
       connectivityProvider: connectivityProvider ?? this,
       fileDirectory:
           fileDirectory ?? (await CoreStoreDirectory().getTempDirectory()),
