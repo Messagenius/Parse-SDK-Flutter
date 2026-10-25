@@ -418,6 +418,7 @@ class LiveQueryClient {
         'where': whereMap,
         if (keysToReturn != null && keysToReturn.isNotEmpty)
           'fields': keysToReturn,
+        if (query.watchedKeys.isNotEmpty) 'watch': query.watchedKeys,
       },
     };
     if (_sendSessionId && ParseCoreData().sessionId != null) {

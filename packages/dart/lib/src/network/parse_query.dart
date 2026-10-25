@@ -48,6 +48,7 @@ class QueryBuilder<T extends ParseObject> {
           copy.limiters.putIfAbsent(key, () => value.toString()),
     );
     copy.queryViaPost = query.queryViaPost;
+    copy.watchedKeys = List<String>.of(query.watchedKeys);
     return copy;
   }
 
@@ -62,6 +63,8 @@ class QueryBuilder<T extends ParseObject> {
   /// Sends this query as `POST` with `_method: "GET"` (`true`) or as `GET`
   /// (`false`). `null` follows the global [ParseCoreData.queryViaPost].
   bool? queryViaPost;
+
+  List<String> watchedKeys = <String>[];
 
   /// Used by ParseRelation getQuery()
   void setRedirectClassNameForKey(String key) {
@@ -113,6 +116,12 @@ class QueryBuilder<T extends ParseObject> {
   /// this is useful for large objects
   void keysToReturn(List<String> keys) {
     limiters['keys'] = concatenateArray(keys);
+  }
+
+  /// LiveQuery only: fire `create`/`update` events only when one of [keys]
+  /// changes. Requires Parse Server 6.0.0+.
+  void watch(List<String> keys) {
+    watchedKeys = keys;
   }
 
   ///Exclude specific fields from the returned query
