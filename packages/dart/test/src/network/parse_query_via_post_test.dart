@@ -151,6 +151,7 @@ void main() {
       await queryBuilder.count();
       Map<String, dynamic> body = capturedPostBody();
       expect(body['count'], 1);
+      expect(body['limit'], 0);
       expect(body['_method'], 'GET');
 
       await QueryBuilder<ParseObject>.copy(queryBuilder).query();

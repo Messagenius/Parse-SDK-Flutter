@@ -652,7 +652,7 @@ class QueryBuilder<T extends ParseObject> {
   /// Builds the query for Parse
   String _buildQueryCount() {
     queries = _checkForMultipleColumnInstances(queries);
-    return 'where={${buildQueries(queries)}}&count=1';
+    return 'where={${buildQueries(queries)}}&count=1&limit=0';
   }
 
   /// Runs through all queries and adds them to a query string
