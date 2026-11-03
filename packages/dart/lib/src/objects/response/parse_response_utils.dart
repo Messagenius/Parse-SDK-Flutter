@@ -66,6 +66,9 @@ bool isSuccessButNoResults(ParseNetworkResponse apiResponse) {
   final dynamic decodedResponse = jsonDecode(apiResponse.data);
   List<dynamic>? results;
   if (decodedResponse is Map<String, dynamic>) {
+    if (decodedResponse.containsKey('count')) {
+      return false;
+    }
     results = decodedResponse['results'];
   } else if (decodedResponse is List<dynamic>) {
     results = decodedResponse;
